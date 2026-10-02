@@ -164,7 +164,7 @@ export const App = () => {
 
   const addNode = (typeKey, dropPos = null) => {
     // simplified addNode
-    const id = Date.now().toString();
+    const id = crypto.randomUUID();
     const newNode = {
       id,
       type: typeKey,

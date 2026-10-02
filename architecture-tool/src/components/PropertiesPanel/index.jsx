@@ -239,7 +239,7 @@ export const PropertiesPanel = ({
                             type="number"
                             value={Math.round(selectedNode.width || 160)}
                             onChange={(e) =>
-                              updateNodeData(selectedNode.id, 'width', parseInt(e.target.value))
+                              updateNodeData(selectedNode.id, 'width', parseInt(e.target.value) || 160)
                             }
                             className="w-full p-1.5 border border-slate-200 rounded text-xs bg-white"
                           />
@@ -252,7 +252,7 @@ export const PropertiesPanel = ({
                             type="number"
                             value={Math.round(selectedNode.height || 100)}
                             onChange={(e) =>
-                              updateNodeData(selectedNode.id, 'height', parseInt(e.target.value))
+                              updateNodeData(selectedNode.id, 'height', parseInt(e.target.value) || 100)
                             }
                             className="w-full p-1.5 border border-slate-200 rounded text-xs bg-white"
                           />
@@ -343,14 +343,16 @@ export const PropertiesPanel = ({
                 </div>
                 <div
                   className="flex items-center gap-2 p-1.5 border border-amber-200 bg-amber-50 rounded cursor-pointer"
-                  onClick={() =>
-                    updateMultipleNodesData(selectedNodeIds, 'hasRisk', !selectedNode?.hasRisk)
-                  }
+                  onClick={() => {
+                    const selectedNodes = nodes.filter((n) => selectedNodeIds.includes(n.id));
+                    const allHaveRisk = selectedNodes.every((n) => n.hasRisk);
+                    updateMultipleNodesData(selectedNodeIds, 'hasRisk', !allHaveRisk);
+                  }}
                 >
                   <input
                     type="checkbox"
-                    checked={selectedNode?.hasRisk || false}
-                    readOnly
+                    checked={nodes.filter((n) => selectedNodeIds.includes(n.id)).every((n) => n.hasRisk)}
+                    onChange={() => {}}
                     className="w-3 h-3 text-amber-600 rounded"
                   />
                   <span className="text-[10px] font-bold text-amber-800">Risk İşaretle (Toplu)</span>
