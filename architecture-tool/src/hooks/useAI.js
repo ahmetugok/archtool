@@ -1,11 +1,13 @@
-import React, { useRef, useState } from 'react';
-import { useStore } from '../store/useStore';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 
 export const useAI = () => {
-  const aiProvider = localStorage.getItem('ai_provider') || 'gemini';
-  const apiKeyInput = localStorage.getItem(aiProvider === 'gemini' ? 'gemini_api_key' : 'azure_api_key') || '';
-  const azureEndpoint = localStorage.getItem('azure_endpoint') || '';
+  const [aiProvider] = useState(() => localStorage.getItem('ai_provider') || 'gemini');
+  const [apiKeyInput] = useState(() => {
+    const provider = localStorage.getItem('ai_provider') || 'gemini';
+    return localStorage.getItem(provider === 'gemini' ? 'gemini_api_key' : 'azure_api_key') || '';
+  });
+  const [azureEndpoint] = useState(() => localStorage.getItem('azure_endpoint') || '');
   const [isAiLoading, setIsAiLoading] = useState(false);
 
   const callAI = async (prompt) => {
@@ -18,10 +20,10 @@ export const useAI = () => {
       let responseText = '';
       if (aiProvider === 'gemini') {
         const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKeyInput}`,
+          'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent',
           {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKeyInput },
             body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
           }
         );

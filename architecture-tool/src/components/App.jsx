@@ -4,6 +4,8 @@ import { useAI } from '../hooks/useAI';
 import { Sidebar } from './Sidebar';
 import { PropertiesPanel } from './PropertiesPanel';
 import { Canvas } from './Canvas';
+import { AiReportDrawer } from './AiReportDrawer';
+import { PageBar } from './PageBar';
 import { useClipboard } from '../hooks/useClipboard';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import toast, { Toaster } from 'react-hot-toast';
@@ -25,6 +27,11 @@ export const App = () => {
     getConnections,
     setNodes,
     setConnections,
+    saveHistory,
+    undo,
+    redo,
+    past,
+    future,
   } = useStore();
 
   const nodes = getNodes();
@@ -36,16 +43,6 @@ export const App = () => {
     return saved === 'true';
   });
   const [showLeftPanel, setShowLeftPanel] = useState(false);
-  const [expandedSections, setExpandedSections] = useState({
-    temel: true,
-    gorunum: false,
-    yazi: false,
-    boyut: false,
-  });
-
-  const toggleSection = (section) =>
-    setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
-
   const [editingField, setEditingField] = useState(null);
   const [notePopupNodeId, setNotePopupNodeId] = useState(null);
 
@@ -62,12 +59,13 @@ export const App = () => {
   const [isPanning, setIsPanning] = useState(false);
   const [dragStartPos, setDragStartPos] = useState({ x: 0, y: 0 });
   const [showQuickAddHandles, setShowQuickAddHandles] = useState(false);
+  const [aiReport, setAiReport] = useState(null);
 
   const contentRef = React.useRef(null);
 
   const { callAI, isAiLoading } = useAI();
   const { deleteSelected, copySelected, cutSelected, pasteCopied } = useClipboard();
-  useKeyboardShortcuts(deleteSelected, copySelected, cutSelected, pasteCopied);
+  useKeyboardShortcuts(deleteSelected, copySelected, cutSelected, pasteCopied, undo, redo);
 
   const handleAiArchitectureAudit = async () => {
     if (nodes.length) {
@@ -78,7 +76,7 @@ export const App = () => {
         })}. Türkçe Rapor: 1.Süreç 2.Risk 3.Öneri 4.Sistem Tasarım Soruları`
       );
       if (res) {
-        toast.success('Rapor başarıyla oluşturuldu');
+        setAiReport(res);
       }
     }
   };
@@ -163,8 +161,8 @@ export const App = () => {
   };
 
   const addNode = (typeKey, dropPos = null) => {
-    // simplified addNode
-    const id = Date.now().toString();
+    saveHistory();
+    const id = crypto.randomUUID();
     const newNode = {
       id,
       type: typeKey,
@@ -180,6 +178,7 @@ export const App = () => {
   return (
     <div className="flex h-screen w-screen overflow-hidden text-slate-800 text-sm selection:bg-blue-200">
       <Toaster position="top-right" />
+      <AiReportDrawer report={aiReport} onClose={() => setAiReport(null)} />
       <Sidebar
         isLeftPanelExpanded={isLeftPanelExpanded}
         setIsLeftPanelExpanded={setIsLeftPanelExpanded}
@@ -190,6 +189,10 @@ export const App = () => {
         handleAiArchitectureAudit={handleAiArchitectureAudit}
         isAiLoading={isAiLoading}
         nodes={nodes}
+        undo={undo}
+        redo={redo}
+        canUndo={past.length > 0}
+        canRedo={future.length > 0}
       />
       <div className="flex-1 flex flex-col min-w-0 relative">
         <div className="flex-1 flex relative">
@@ -236,12 +239,11 @@ export const App = () => {
           />
           <PropertiesPanel
             deleteSelected={deleteSelected}
-            expandedSections={expandedSections}
-            toggleSection={toggleSection}
             handleAiNodeDescription={handleAiNodeDescription}
             isAiLoading={isAiLoading}
           />
         </div>
+        <PageBar />
       </div>
     </div>
   );
