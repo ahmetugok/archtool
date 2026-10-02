@@ -63,6 +63,35 @@ export const useStore = create((set, get) => ({
 
   setPages: (pages) => set({ pages }),
   setCurrentPageId: (id) => set({ currentPageId: id, past: [], future: [] }),
+
+  addPage: () => {
+    const state = get();
+    const newPage = {
+      id: crypto.randomUUID(),
+      name: `Sayfa ${state.pages.length + 1}`,
+      nodes: [],
+      connections: [],
+      legendItems: {},
+    };
+    set({ pages: [...state.pages, newPage], currentPageId: newPage.id, past: [], future: [] });
+  },
+
+  deletePage: (id) => {
+    const state = get();
+    if (state.pages.length <= 1) return;
+    const remaining = state.pages.filter((p) => p.id !== id);
+    const newCurrentId =
+      state.currentPageId === id
+        ? remaining[Math.max(0, state.pages.findIndex((p) => p.id === id) - 1)].id
+        : state.currentPageId;
+    set({ pages: remaining, currentPageId: newCurrentId, past: [], future: [] });
+  },
+
+  renamePage: (id, name) => {
+    set((state) => ({
+      pages: state.pages.map((p) => (p.id === id ? { ...p, name } : p)),
+    }));
+  },
   setSelectedNodeIds: (ids) => set({ selectedNodeIds: typeof ids === 'function' ? ids(get().selectedNodeIds) : ids }),
   setSelectedConnectionId: (id) => set({ selectedConnectionId: id }),
   setScale: (scale) => set({ scale: typeof scale === 'function' ? scale(get().scale) : scale }),

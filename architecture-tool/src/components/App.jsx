@@ -5,6 +5,7 @@ import { Sidebar } from './Sidebar';
 import { PropertiesPanel } from './PropertiesPanel';
 import { Canvas } from './Canvas';
 import { AiReportDrawer } from './AiReportDrawer';
+import { PageBar } from './PageBar';
 import { useClipboard } from '../hooks/useClipboard';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import toast, { Toaster } from 'react-hot-toast';
@@ -242,6 +243,7 @@ export const App = () => {
             isAiLoading={isAiLoading}
           />
         </div>
+        <PageBar />
       </div>
     </div>
   );
