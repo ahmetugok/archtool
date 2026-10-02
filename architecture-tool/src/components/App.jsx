@@ -4,6 +4,7 @@ import { useAI } from '../hooks/useAI';
 import { Sidebar } from './Sidebar';
 import { PropertiesPanel } from './PropertiesPanel';
 import { Canvas } from './Canvas';
+import { AiReportDrawer } from './AiReportDrawer';
 import { useClipboard } from '../hooks/useClipboard';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import toast, { Toaster } from 'react-hot-toast';
@@ -62,6 +63,7 @@ export const App = () => {
   const [isPanning, setIsPanning] = useState(false);
   const [dragStartPos, setDragStartPos] = useState({ x: 0, y: 0 });
   const [showQuickAddHandles, setShowQuickAddHandles] = useState(false);
+  const [aiReport, setAiReport] = useState(null);
 
   const contentRef = React.useRef(null);
 
@@ -78,7 +80,7 @@ export const App = () => {
         })}. Türkçe Rapor: 1.Süreç 2.Risk 3.Öneri 4.Sistem Tasarım Soruları`
       );
       if (res) {
-        toast.success('Rapor başarıyla oluşturuldu');
+        setAiReport(res);
       }
     }
   };
@@ -180,6 +182,7 @@ export const App = () => {
   return (
     <div className="flex h-screen w-screen overflow-hidden text-slate-800 text-sm selection:bg-blue-200">
       <Toaster position="top-right" />
+      <AiReportDrawer report={aiReport} onClose={() => setAiReport(null)} />
       <Sidebar
         isLeftPanelExpanded={isLeftPanelExpanded}
         setIsLeftPanelExpanded={setIsLeftPanelExpanded}

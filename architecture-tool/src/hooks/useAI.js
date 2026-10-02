@@ -1,5 +1,4 @@
-import React, { useRef, useState } from 'react';
-import { useStore } from '../store/useStore';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 
 export const useAI = () => {
@@ -18,10 +17,10 @@ export const useAI = () => {
       let responseText = '';
       if (aiProvider === 'gemini') {
         const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKeyInput}`,
+          'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent',
           {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKeyInput },
             body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
           }
         );
