@@ -26,6 +26,11 @@ export const App = () => {
     getConnections,
     setNodes,
     setConnections,
+    saveHistory,
+    undo,
+    redo,
+    past,
+    future,
   } = useStore();
 
   const nodes = getNodes();
@@ -59,7 +64,7 @@ export const App = () => {
 
   const { callAI, isAiLoading } = useAI();
   const { deleteSelected, copySelected, cutSelected, pasteCopied } = useClipboard();
-  useKeyboardShortcuts(deleteSelected, copySelected, cutSelected, pasteCopied);
+  useKeyboardShortcuts(deleteSelected, copySelected, cutSelected, pasteCopied, undo, redo);
 
   const handleAiArchitectureAudit = async () => {
     if (nodes.length) {
@@ -155,7 +160,7 @@ export const App = () => {
   };
 
   const addNode = (typeKey, dropPos = null) => {
-    // simplified addNode
+    saveHistory();
     const id = crypto.randomUUID();
     const newNode = {
       id,
@@ -183,6 +188,10 @@ export const App = () => {
         handleAiArchitectureAudit={handleAiArchitectureAudit}
         isAiLoading={isAiLoading}
         nodes={nodes}
+        undo={undo}
+        redo={redo}
+        canUndo={past.length > 0}
+        canRedo={future.length > 0}
       />
       <div className="flex-1 flex flex-col min-w-0 relative">
         <div className="flex-1 flex relative">

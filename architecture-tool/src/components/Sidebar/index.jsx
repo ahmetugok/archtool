@@ -1,6 +1,6 @@
 import React from 'react';
 import { NODE_TYPES } from '../../constants';
-import { Sparkles, Layers, ArrowRight } from 'lucide-react';
+import { Sparkles, Layers, ArrowRight, Undo2, Redo2 } from 'lucide-react';
 
 export const Sidebar = ({
   isLeftPanelExpanded,
@@ -12,6 +12,10 @@ export const Sidebar = ({
   handleAiArchitectureAudit,
   isAiLoading,
   nodes,
+  undo,
+  redo,
+  canUndo,
+  canRedo,
 }) => {
   const nodeTools = [
     { type: 'START', label: 'Başlangıç Düğümü', color: 'text-emerald-600', group: 'flow' },
@@ -36,7 +40,23 @@ export const Sidebar = ({
         <h2 className="text-xs font-bold text-slate-800 flex items-center gap-2">
           <Layers className="w-4 h-4 text-blue-600" /> ARAÇ KUTUSU
         </h2>
-        <div className="flex gap-1">
+        <div className="flex gap-1 items-center">
+          <button
+            onClick={undo}
+            disabled={!canUndo}
+            className="p-1.5 rounded transition-colors hover:bg-slate-200 text-slate-500 disabled:opacity-30 disabled:cursor-not-allowed"
+            title="Geri Al (Ctrl+Z)"
+          >
+            <Undo2 className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={redo}
+            disabled={!canRedo}
+            className="p-1.5 rounded transition-colors hover:bg-slate-200 text-slate-500 disabled:opacity-30 disabled:cursor-not-allowed"
+            title="İleri Al (Ctrl+Y)"
+          >
+            <Redo2 className="w-3.5 h-3.5" />
+          </button>
           <button
             onClick={() => {
               setIsLeftPanelPinned(!isLeftPanelPinned);

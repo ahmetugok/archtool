@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { useStore } from '../store/useStore';
 
 export const useClipboard = () => {
@@ -8,6 +8,7 @@ export const useClipboard = () => {
   const setNodes = useStore((state) => state.setNodes);
   const setConnections = useStore((state) => state.setConnections);
   const setSelectedNodeIds = useStore((state) => state.setSelectedNodeIds);
+  const saveHistory = useStore((state) => state.saveHistory);
 
   const copiedNodesRef = useRef([]);
   const copiedConnectionsRef = useRef([]);
@@ -25,6 +26,7 @@ export const useClipboard = () => {
 
   const cutSelected = () => {
     if (selectedNodeIds.length > 0) {
+      saveHistory();
       copiedNodesRef.current = getNodes().filter((n) => selectedNodeIds.includes(n.id));
       copiedConnectionsRef.current = getConnections().filter(
         (c) => selectedNodeIds.includes(c.from) && selectedNodeIds.includes(c.to)
@@ -39,6 +41,7 @@ export const useClipboard = () => {
   };
 
   const pasteCopied = () => {
+    saveHistory();
     const copiedNodes = copiedNodesRef.current;
     const copiedConnections = copiedConnectionsRef.current;
     const isCut = isCutRef.current;
@@ -78,6 +81,7 @@ export const useClipboard = () => {
   };
 
   const deleteSelected = () => {
+    saveHistory();
     const selectedConnectionId = useStore.getState().selectedConnectionId;
     if (selectedNodeIds.length > 0) {
       setNodes((prev) => prev.filter((n) => !selectedNodeIds.includes(n.id)));

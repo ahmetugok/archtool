@@ -58,9 +58,11 @@ export const useStore = create((set, get) => ({
   selectedConnectionId: null,
   scale: 1,
   pan: { x: 0, y: 0 },
+  past: [],
+  future: [],
 
   setPages: (pages) => set({ pages }),
-  setCurrentPageId: (id) => set({ currentPageId: id }),
+  setCurrentPageId: (id) => set({ currentPageId: id, past: [], future: [] }),
   setSelectedNodeIds: (ids) => set({ selectedNodeIds: typeof ids === 'function' ? ids(get().selectedNodeIds) : ids }),
   setSelectedConnectionId: (id) => set({ selectedConnectionId: id }),
   setScale: (scale) => set({ scale: typeof scale === 'function' ? scale(get().scale) : scale }),
@@ -105,5 +107,60 @@ export const useStore = create((set, get) => ({
     get().setNodes((nodes) =>
       nodes.map((n) => (ids.includes(n.id) ? { ...n, [field]: value } : n))
     );
+  },
+
+  saveHistory: () => {
+    const state = get();
+    const currentPage = state.pages.find((p) => p.id === state.currentPageId);
+    if (!currentPage) return;
+    set((prev) => ({
+      past: [
+        ...prev.past.slice(-49),
+        { nodes: [...currentPage.nodes], connections: [...currentPage.connections] },
+      ],
+      future: [],
+    }));
+  },
+
+  undo: () => {
+    const state = get();
+    if (state.past.length === 0) return;
+    const snapshot = state.past[state.past.length - 1];
+    const currentPage = state.pages.find((p) => p.id === state.currentPageId);
+    set((prev) => ({
+      past: prev.past.slice(0, -1),
+      future: [
+        { nodes: [...currentPage.nodes], connections: [...currentPage.connections] },
+        ...prev.future.slice(0, 49),
+      ],
+      pages: prev.pages.map((p) =>
+        p.id === prev.currentPageId
+          ? { ...p, nodes: snapshot.nodes, connections: snapshot.connections }
+          : p
+      ),
+      selectedNodeIds: [],
+      selectedConnectionId: null,
+    }));
+  },
+
+  redo: () => {
+    const state = get();
+    if (state.future.length === 0) return;
+    const snapshot = state.future[0];
+    const currentPage = state.pages.find((p) => p.id === state.currentPageId);
+    set((prev) => ({
+      past: [
+        ...prev.past.slice(-49),
+        { nodes: [...currentPage.nodes], connections: [...currentPage.connections] },
+      ],
+      future: prev.future.slice(1),
+      pages: prev.pages.map((p) =>
+        p.id === prev.currentPageId
+          ? { ...p, nodes: snapshot.nodes, connections: snapshot.connections }
+          : p
+      ),
+      selectedNodeIds: [],
+      selectedConnectionId: null,
+    }));
   },
 }));

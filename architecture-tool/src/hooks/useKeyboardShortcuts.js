@@ -5,7 +5,9 @@ export const useKeyboardShortcuts = (
   deleteSelected,
   copySelected,
   cutSelected,
-  pasteCopied
+  pasteCopied,
+  undo,
+  redo
 ) => {
   const selectedNodeIds = useStore((state) => state.selectedNodeIds);
   const setNodes = useStore((state) => state.setNodes);
@@ -18,6 +20,19 @@ export const useKeyboardShortcuts = (
 
       if (e.key === 'Delete' || e.key === 'Backspace') {
         if (!isInput) deleteSelected();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        if (!isInput) {
+          e.preventDefault();
+          if (e.shiftKey) redo();
+          else undo();
+        }
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+        if (!isInput) {
+          e.preventDefault();
+          redo();
+        }
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
         if (!isInput) copySelected();
@@ -51,5 +66,5 @@ export const useKeyboardShortcuts = (
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [deleteSelected, copySelected, cutSelected, pasteCopied, selectedNodeIds, setNodes]);
+  }, [deleteSelected, copySelected, cutSelected, pasteCopied, undo, redo, selectedNodeIds, setNodes]);
 };
