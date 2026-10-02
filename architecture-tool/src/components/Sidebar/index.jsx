@@ -1,6 +1,6 @@
 import React from 'react';
 import { NODE_TYPES } from '../../constants';
-import { Sparkles, Layers, Minimize2, ArrowRight } from 'lucide-react';
+import { Sparkles, Layers, ArrowRight } from 'lucide-react';
 
 export const Sidebar = ({
   isLeftPanelExpanded,
@@ -30,29 +30,22 @@ export const Sidebar = ({
     { type: 'MANUAL', label: 'Manuel Giriş', color: 'text-slate-600', group: 'tech' },
   ];
 
-  return (
-    <div
-      className={`bg-white/95 backdrop-blur-sm border-r border-slate-200 flex flex-col z-40 transition-all duration-300 ease-in-out ${
-        isLeftPanelPinned ? 'w-64' : showLeftPanel ? 'w-64 absolute h-full shadow-2xl' : 'w-0 overflow-hidden'
-      }`}
-      onMouseEnter={() => {
-        if (!isLeftPanelPinned && window.innerWidth >= 768) setShowLeftPanel(true);
-      }}
-      onMouseLeave={() => {
-        if (!isLeftPanelPinned && window.innerWidth >= 768) setShowLeftPanel(false);
-      }}
-    >
+  const panelContent = (
+    <>
       <div className="p-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between shrink-0 h-14">
         <h2 className="text-xs font-bold text-slate-800 flex items-center gap-2">
           <Layers className="w-4 h-4 text-blue-600" /> ARAÇ KUTUSU
         </h2>
         <div className="flex gap-1">
           <button
-            onClick={() => setIsLeftPanelPinned(!isLeftPanelPinned)}
+            onClick={() => {
+              setIsLeftPanelPinned(!isLeftPanelPinned);
+              if (!isLeftPanelPinned) setShowLeftPanel(false);
+            }}
             className={`p-1.5 rounded transition-colors hidden md:block ${
               isLeftPanelPinned ? 'bg-blue-100 text-blue-600' : 'hover:bg-slate-200 text-slate-500'
             }`}
-            title={isLeftPanelPinned ? "Paneli Sabitlemeyi Kaldır" : "Paneli Sabitle"}
+            title={isLeftPanelPinned ? 'Paneli Sabitlemeyi Kaldır' : 'Paneli Sabitle'}
           >
             <ArrowRight className={`w-3.5 h-3.5 transition-transform ${isLeftPanelPinned ? 'rotate-180' : ''}`} />
           </button>
@@ -77,7 +70,7 @@ export const Sidebar = ({
                     className="flex flex-col items-center justify-center p-2 rounded-lg border border-slate-200 bg-white hover:border-blue-500 hover:shadow-md cursor-grab transition-all group"
                   >
                     <Icon className={`w-5 h-5 mb-1.5 transition-transform group-hover:scale-110 ${tool.color}`} />
-                    <span className="text-[9px] font-bold text-slate-600 text-center leading-tight">
+                    <span className="text-[10px] font-bold text-slate-600 text-center leading-tight">
                       {tool.label}
                     </span>
                   </div>
@@ -103,7 +96,7 @@ export const Sidebar = ({
                     className="flex flex-col items-center justify-center p-2 rounded-lg border border-slate-200 bg-white hover:border-blue-500 hover:shadow-md cursor-grab transition-all group"
                   >
                     <Icon className={`w-5 h-5 mb-1.5 transition-transform group-hover:scale-110 ${tool.color}`} />
-                    <span className="text-[9px] font-bold text-slate-600 text-center leading-tight">
+                    <span className="text-[10px] font-bold text-slate-600 text-center leading-tight">
                       {tool.label}
                     </span>
                   </div>
@@ -129,7 +122,7 @@ export const Sidebar = ({
                     className="flex flex-col items-center justify-center p-2 rounded-lg border border-slate-200 bg-white hover:border-blue-500 hover:shadow-md cursor-grab transition-all group"
                   >
                     <Icon className={`w-5 h-5 mb-1.5 transition-transform group-hover:scale-110 ${tool.color}`} />
-                    <span className="text-[9px] font-bold text-slate-600 text-center leading-tight">
+                    <span className="text-[10px] font-bold text-slate-600 text-center leading-tight">
                       {tool.label}
                     </span>
                   </div>
@@ -152,6 +145,36 @@ export const Sidebar = ({
             )}
           </button>
         </div>
+      </div>
+    </>
+  );
+
+  if (isLeftPanelPinned) {
+    return (
+      <div className="w-64 bg-white/95 backdrop-blur-sm border-r border-slate-200 flex flex-col z-40 shrink-0">
+        {panelContent}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="relative shrink-0 w-3 z-40"
+      onMouseEnter={() => setShowLeftPanel(true)}
+      onMouseLeave={() => setShowLeftPanel(false)}
+    >
+      {/* Hover strip indicator */}
+      <div className="absolute left-0 top-0 h-full w-3 flex flex-col items-center justify-center gap-1.5 cursor-pointer">
+        <div className={`w-0.5 h-6 rounded-full transition-colors ${showLeftPanel ? 'bg-blue-400' : 'bg-slate-300'}`} />
+      </div>
+
+      {/* Floating panel */}
+      <div
+        className={`absolute top-0 left-0 h-full bg-white/95 backdrop-blur-sm border-r border-slate-200 flex flex-col shadow-2xl transition-all duration-200 ease-in-out overflow-hidden ${
+          showLeftPanel ? 'w-64' : 'w-0'
+        }`}
+      >
+        {panelContent}
       </div>
     </div>
   );
