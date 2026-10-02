@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useStore } from '../../store/useStore';
 import {
   FileText,
@@ -10,11 +10,18 @@ import { BADGE_COLORS, BG_COLORS, BORDER_COLORS } from '../../constants';
 
 export const PropertiesPanel = ({
   deleteSelected,
-  expandedSections,
-  toggleSection,
   handleAiNodeDescription,
   isAiLoading,
 }) => {
+  const [expandedSections, setExpandedSections] = useState({
+    temel: true,
+    gorunum: false,
+    yazi: false,
+    boyut: false,
+  });
+  const toggleSection = (section) =>
+    setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
+
   const selectedNodeIds = useStore((state) => state.selectedNodeIds);
   const selectedConnectionId = useStore((state) => state.selectedConnectionId);
   const nodes = useStore((state) => state.getNodes());
@@ -198,18 +205,15 @@ export const PropertiesPanel = ({
                             />
                           </div>
                         )}
-                      <div
-                        className="flex items-center gap-2 p-1.5 border border-amber-200 bg-amber-50 rounded cursor-pointer"
-                        onClick={() => updateNodeData(selectedNode.id, 'hasRisk', !selectedNode.hasRisk)}
-                      >
+                      <label className="flex items-center gap-2 p-1.5 border border-amber-200 bg-amber-50 rounded cursor-pointer">
                         <input
                           type="checkbox"
                           checked={selectedNode.hasRisk || false}
-                          readOnly
+                          onChange={() => updateNodeData(selectedNode.id, 'hasRisk', !selectedNode.hasRisk)}
                           className="w-3 h-3 text-amber-600 rounded"
                         />
                         <span className="text-[10px] font-bold text-amber-800">Risk İşaretle</span>
-                      </div>
+                      </label>
                     </div>
                   )}
                 </div>

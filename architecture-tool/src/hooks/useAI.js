@@ -2,9 +2,12 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 
 export const useAI = () => {
-  const aiProvider = localStorage.getItem('ai_provider') || 'gemini';
-  const apiKeyInput = localStorage.getItem(aiProvider === 'gemini' ? 'gemini_api_key' : 'azure_api_key') || '';
-  const azureEndpoint = localStorage.getItem('azure_endpoint') || '';
+  const [aiProvider] = useState(() => localStorage.getItem('ai_provider') || 'gemini');
+  const [apiKeyInput] = useState(() => {
+    const provider = localStorage.getItem('ai_provider') || 'gemini';
+    return localStorage.getItem(provider === 'gemini' ? 'gemini_api_key' : 'azure_api_key') || '';
+  });
+  const [azureEndpoint] = useState(() => localStorage.getItem('azure_endpoint') || '');
   const [isAiLoading, setIsAiLoading] = useState(false);
 
   const callAI = async (prompt) => {

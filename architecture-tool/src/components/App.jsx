@@ -37,16 +37,6 @@ export const App = () => {
     return saved === 'true';
   });
   const [showLeftPanel, setShowLeftPanel] = useState(false);
-  const [expandedSections, setExpandedSections] = useState({
-    temel: true,
-    gorunum: false,
-    yazi: false,
-    boyut: false,
-  });
-
-  const toggleSection = (section) =>
-    setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
-
   const [editingField, setEditingField] = useState(null);
   const [notePopupNodeId, setNotePopupNodeId] = useState(null);
 
@@ -239,8 +229,6 @@ export const App = () => {
           />
           <PropertiesPanel
             deleteSelected={deleteSelected}
-            expandedSections={expandedSections}
-            toggleSection={toggleSection}
             handleAiNodeDescription={handleAiNodeDescription}
             isAiLoading={isAiLoading}
           />
